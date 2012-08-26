@@ -26,7 +26,7 @@ extends \Lohini\Packages\Package
 	 */
 	public function compile(\Nette\Config\Configurator $config, \Nette\Config\Compiler $compiler, \Lohini\Packages\PackagesContainer $packages)
 	{
-		// Kdyby Components
+		// Lohini Components
 		$compiler->addExtension('header', new \Lohini\Components\Header\DI\HeaderExtension);
 		$compiler->addExtension('kc', new DI\ComponentsExtension);
 	}

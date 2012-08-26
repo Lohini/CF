@@ -43,7 +43,7 @@ final class CF
 	}
 
 	/**
-	 * @return \Kdyby\Packages\PackagesList
+	 * @return \Lohini\Packages\PackagesList
 	 */
 	public static function createPackagesList()
 	{
