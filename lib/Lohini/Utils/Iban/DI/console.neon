@@ -1,0 +1,3 @@
+- Lohini\Utils\Iban\Console\InfoCommand
+- Lohini\Utils\Iban\Console\UpdateCommand
+- Lohini\Utils\Iban\Console\DumpCommand

@@ -36,6 +36,7 @@ extends \Nette\DI\CompilerExtension
 				->setClass('Lohini\Utils\Iban\Verifier', [$this->prefix('@registry')])
 				->setInject(FALSE)
 				;
+		$this->loadConsole();
 	}
 
 	/**
@@ -52,6 +53,21 @@ extends \Nette\DI\CompilerExtension
 				$defaults
 				)
 			);
+	}
+
+	protected function loadConsole()
+	{
+		$builder=$this->getContainerBuilder();
+		foreach ($this->loadFromFile(__DIR__.'/console.neon') as $i => $command) {
+			$cli=$builder->addDefinition($this->prefix('cli.'.$i))
+					->addTag(\Kdyby\Console\DI\ConsoleExtension::COMMAND_TAG);
+			if (is_string($command)) {
+				$cli->setClass($command);
+				}
+			else {
+				throw new \Lohini\Utils\Iban\IbanException('Not supported');
+				}
+			}
 	}
 
 	/**
