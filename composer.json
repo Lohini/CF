@@ -11,7 +11,8 @@
 		}
 	],
 	"require": {
-		"lohini/framework": "dev-master"
+		"lohini/framework": "dev-master",
+		"kdyby/console": "@dev"
 	},
 	"autoload": {
 		"psr-0": {
