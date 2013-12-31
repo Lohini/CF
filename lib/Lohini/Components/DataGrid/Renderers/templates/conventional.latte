@@ -1,0 +1,21 @@
+{snippetArea}
+{snippet $control->name}
+
+<div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
+
+{control $control begin}
+{control $control errors}
+{control $control body}
+{control $control end}
+
+{/snippet}
+{/snippetArea}
+{*
+<script>
+	head.js(
+		{$basePath}+'/js/netteForms.js',
+		{$basePath}+'/js/jquery.ajaxform.js',
+		{$basePath}+'/js/datagrid.js'
+		);
+</script>
+*}
