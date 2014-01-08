@@ -80,6 +80,6 @@ extends TextColumn
 			return;
 			}
 
-		$this->getDataGrid()->getDataSource()->filter($this->name, '=', $value);
+		$this->getDataGrid()->getDataSource()->filter($this->name, '=', $value, NULL, 'DATE');
 	}
 }

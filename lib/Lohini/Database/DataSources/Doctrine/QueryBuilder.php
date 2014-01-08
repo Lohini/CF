@@ -49,6 +49,7 @@ extends \Lohini\Database\DataSources\Mapped
 	public function __construct(\Doctrine\ORM\QueryBuilder $qb)
 	{
 		$this->qb=$qb;
+		$this->qb->getEntityManager()->getConfiguration()->addCustomDatetimeFunction('date', __NAMESPACE__.'\Utils\DateFunction');
 	}
 
 	public function __clone()
@@ -66,7 +67,7 @@ extends \Lohini\Database\DataSources\Mapped
 	 * @return QueryBuilder (fluent)
 	 * @throws \Nette\InvalidArgumentException
 	 */
-	public function filter($column, $operation=self::EQUAL, $value=NULL, $chainType=NULL)
+	public function filter($column, $operation=self::EQUAL, $value=NULL, $chainType=NULL, $colfunc=NULL)
 	{
 		if (!$this->hasColumn($column)) {
 			throw new \Nette\InvalidArgumentException('Trying to filter data source by unknown column.');
@@ -82,10 +83,14 @@ extends \Lohini\Database\DataSources\Mapped
 			foreach ($operation as $t) {
 				$this->validateFilterOperation($t);
 				if ($t===self::IS_NULL || $t===self::IS_NOT_NULL) {
-					$conds[]=$this->mapping[$column]." $t";
+					$conds[]= $colfunc
+						? "$colfunc({$this->mapping[$column]}) $t"
+						: $this->mapping[$column]." $t";
 					}
 				else {
-					$conds[]=$this->mapping[$column]." $t ?$nextParamId";
+					$conds[]=$colfunc
+							? "$colfunc({$this->mapping[$column]}) $t ?$nextParamId"
+							: $this->mapping[$column]." $t ?$nextParamId";
 					$this->qb->setParameter(
 							$nextParamId++,
 							($t===self::LIKE || $t===self::NOT_LIKE)? DataSources\Utils\WildcardHelper::formatLikeStatementWildcards($value) : $value
@@ -105,10 +110,16 @@ extends \Lohini\Database\DataSources\Mapped
 		else {
 			$this->validateFilterOperation($operation);
 			if ($operation===self::IS_NULL || $operation===self::IS_NOT_NULL) {
-				$this->qb->andWhere($this->mapping[$column]." $operation");
+				$where=$colfunc
+					? "$colfunc({$this->mapping[$column]}) $operation"
+					: $this->mapping[$column]." $operation";
+				$this->qb->andWhere($where);
 				}
 			else {
-				$this->qb->andWhere($this->mapping[$column]." $operation ?$nextParamId");
+				$where= $colfunc
+					? "$colfunc({$this->mapping[$column]}) $operation ?$nextParamId"
+					: $this->mapping[$column]." $operation ?$nextParamId";
+				$this->qb->andWhere($where);
 				$this->qb->setParameter(
 						$nextParamId,
 						($operation===self::LIKE || $operation===self::NOT_LIKE)? DataSources\Utils\WildcardHelper::formatLikeStatementWildcards($value) : $value
@@ -267,7 +278,7 @@ extends \Lohini\Database\DataSources\Mapped
 
 		$query=clone $this->qb->getQuery();
 		$query->setParameters($this->qb->getQuery()->getParameters());
-		$query->setHint(\Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, array(__NAMESPACE__.'\Utils\DistinctASTWalker'));
+		$query->setHint(\Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, [__NAMESPACE__.'\Utils\DistinctASTWalker']);
 		$query->setMaxResults(NULL)->setFirstResult(NULL);
 		$query->setHint('distinct', $this->mapping[$column]);
 		if (!count($res=$query->getArrayResult())) {
