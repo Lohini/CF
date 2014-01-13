@@ -97,16 +97,17 @@ implements IRenderer
 	public function renderNode(TreeViewNode $node)
 	{
 		$nodes=$node->getNodes();
+		$ncount=$nodes->count()-1;
 		$snippetId=$node->getSnippetId();
 		$nodeContainer=$this->getWrapper('node container');
 		$nodeContainer->id=$snippetId;
 		if ($this->tree->getSelected()==$node->name) {
 			$nodeContainer->addClass($this->getValue('node .selected'));
 			}
-		if ($node->getState()==TreeViewNode::EXPANDED && count($nodes)) {
+		if ($node->getState()==TreeViewNode::EXPANDED && $ncount) {
 			$nodeContainer->addClass($this->getValue('node .expanded'));
 			}
-		if (count($nodes)) {
+		if ($ncount) {
 			switch ($node->getState()) {
 				case TreeViewNode::EXPANDED:
 					$stateLink=$this->renderLink($node, 'stateLink', 'link collapse');
@@ -126,7 +127,7 @@ implements IRenderer
 			$nodeContainer->add($link);
 			}
 		$this->tree->onNodeRender($this->tree, $node, $nodeContainer);
-		if (TreeViewNode::EXPANDED===$node->getState() && count($nodes)) {
+		if (TreeViewNode::EXPANDED===$node->getState() && $ncount) {
 			$nodesContainer=$this->renderNodes($nodes);
 			if (NULL!==$nodesContainer) {
 				$nodeContainer->add($nodesContainer);
