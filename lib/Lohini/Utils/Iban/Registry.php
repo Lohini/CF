@@ -67,8 +67,7 @@ implements \IteratorAggregate
 		$expiration=\Nette\DateTime::from(time())->add(new \DateInterval('P2W'));
 		$dependencies=[
 			Caching\Cache::CONSTS => [
-				'Nette\Framework::REVISION',
-				'Lohini\Framework::REVISION'
+				'Nette\Framework::REVISION'
 				],
 			Caching\Cache::EXPIRATION => $expiration
 			];

@@ -31,6 +31,7 @@ extends \Nette\DI\CompilerExtension
 				->setClass('Lohini\Utils\Iban\Registry', ['@cacheStorage', 'Lohini.Iban'])
 				->addSetup('$sourceUrl', [$config['sourceUrl']])
 				->setInject(FALSE)
+				->setAutowired(FALSE)
 				;
 		$builder->addDefinition($this->prefix('verifier'))
 				->setClass('Lohini\Utils\Iban\Verifier', [$this->prefix('@registry')])

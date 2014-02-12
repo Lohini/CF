@@ -83,7 +83,7 @@ implements \ArrayAccess
 	protected $wasRendered=FALSE;
 	/** @var \Nette\Localization\ITranslator */
 	protected $translator;
-	/** @var string */
+	/** @var bool */
 	public $enableLoadMore;
 
 
@@ -787,7 +787,7 @@ implements \ArrayAccess
 
 		// items per page selector
 		$form->addSelect('items', 'Items per page', array_combine($this->displayedItems, $this->displayedItems));
-		$form['items']->setDefaultValue($this->itemsPerPage);
+		$form['items']->setDefaultValue(in_array($this->itemsPerPage, $this->displayedItems)? $this->itemsPerPage : 'all');
 		$form->addSubmit('itemsSubmit', 'Change');
 
 		// generate filters FormControls
@@ -880,7 +880,7 @@ implements \ArrayAccess
 
 		// page input & items selectbox
 		$form['page']->setValue($this->paginator->page); // intentionally page from paginator
-		$form['items']->setValue($this->paginator->itemsPerPage);
+//		$form['items']->setValue($this->paginator->itemsPerPage);
 	}
 
 	/**
