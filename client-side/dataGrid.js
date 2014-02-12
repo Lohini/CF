@@ -17,6 +17,7 @@
 			$('input:checkbox, select', 'form.datagrid tr.filters').off('change').on('change', this.fnSelectFilter);
 			$('form.datagrid tr.filters input[type=text]').off('keypress').on('keypress', this.submitTextFilter);
 			$('form.datagrid tr.footer select[name=items]').off('change').on('change', this.fnLinesChange);
+			$('form.datagrid tr.footer a.loadMore').off('click').on('click', this.fnLoadMore);
 
 			$('form.datagrid table.datagrid tr.footer input[name=pageSubmit]').hide();
 			$('form.datagrid table.datagrid tr.footer input[name=itemsSubmit]').hide();
@@ -44,7 +45,7 @@
 			},
 		fnLineChecker: function(e) {
 			// only clicks by left button
-			if (e.button!=0) {
+			if (e.button!==0) {
 				return true;
 				}
 
@@ -90,7 +91,7 @@
 			unselected.find('td.checker input:checkbox').prop('checked', true);
 			},
 		fnPageChange: function(e) {
-			if (e.keyCode==13) {
+			if (e.keyCode===13) {
 				$(this).parents('form.datagrid').find('input:submit[name=pageSubmit]').click();
 				return false;
 				}
@@ -103,10 +104,33 @@
 			return false;
 			},
 		submitTextFilter: function(e) {
-			if (e.keyCode==13) {
+			if (e.keyCode===13) {
 				$(this).parents('form.datagrid').find('input:submit[name=filterSubmit]').click();
 				return false;
 				}
+			},
+		fnLoadMore: function() {
+			var data=$(this).data();
+			data.id=$(this).parents('form.datagrid')[0].id;
+			$.post(
+				this.href,
+				data,
+				function(data) {
+					if (data.more) {
+						var $grid=$('form.datagrid#'+data.more.grid),
+							$more=$grid.find('.loadMore');
+						$grid.find('tbody tr').last().after(data.more.rows);
+						if (data.more.more) {
+							$more.data('gridMore', data.more.more);
+							}
+						else {
+							$more.hide();
+							}
+						return false;
+						}
+					}
+				);
+			return false;
 			},
 		// index from
 		previous: null

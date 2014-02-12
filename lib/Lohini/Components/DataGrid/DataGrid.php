@@ -31,6 +31,11 @@ implements \ArrayAccess
 	public $page=1;
 	/**
 	 * @persistent
+	 * @var bool
+	 */
+	public $more=0;
+	/**
+	 * @persistent
 	 * @var string
 	 */
 	public $order='';
@@ -78,6 +83,8 @@ implements \ArrayAccess
 	protected $wasRendered=FALSE;
 	/** @var \Nette\Localization\ITranslator */
 	protected $translator;
+	/** @var string */
+	public $enableLoadMore;
 
 
 	public function __construct()
@@ -318,6 +325,7 @@ implements \ArrayAccess
 							case 'page':
 								$value= ($value>0? $value : 1);
 								break;
+							case 'more':
 							case 'order':
 							case 'filters':
 							case 'itemsPerPage':
@@ -347,6 +355,7 @@ implements \ArrayAccess
 			if (!isset($session->initState)) {
 				$session->initState=[
 					'page' => $this->page,
+					'more' => $this->more,
 					'order' => $this->order,
 					'filters' => $this->filters,
 					'itemsPerPage' => $this->itemsPerPage,
@@ -369,6 +378,7 @@ implements \ArrayAccess
 		if (isset($session->initState)) {
 			$is=$session->initState;
 			$this->page=$is['page'];
+			$this->more=$is['more'];
 			$this->order=$is['order'];
 			$this->filters=$is['filters'];
 			$this->itemsPerPage=$is['itemsPerPage'];
@@ -384,16 +394,26 @@ implements \ArrayAccess
 	{
 		$presenter=$this->getPresenter();
 
-		if ($this->presenter->isAjax()) {
+		if ($presenter->isAjax()) {
+			$post=$presenter->request->getPost();
+			if ($this->enableLoadMore && isset($post['gridMore'])) {
+				$this->page=(int)$post['gridMore'];
+				$this->filterItems();
+				$presenter->payload->more=[
+					'rows' => mb_convert_encoding(call_user_func_array([$this->getRenderer(), 'renderLoadMore'], [$this]), 'HTML-ENTITIES', 'UTF-8'),
+					'grid' => $this->presenter->getRequest()->post['id'],
+					'more' => $this->paginator->pageCount<$this->page+1? NULL : $this->page+1
+					];
+				$presenter->sendPayload();
+				$presenter->terminate();
+				}
 			$presenter->payload->snippets=[];
 
 			$html=trim($this->__toString());
 
 			// Remove snippet-div to emulate native snippets... No extra support on client side is needed...
 			$snippet='snippet-'.$this->getUniqueId().'-grid';
-			$start=strlen('<div id="'.$snippet.'">');
-			$stop=-strlen('</div>');
-			$html=trim(mb_substr($html, $start, $stop));
+			$html=trim(mb_substr($html, strlen('<div id="'.$snippet.'">'), -strlen('</div>')));
 
 			// Send snippet 
 			$presenter->payload->snippets[$snippet]=$html;
@@ -412,7 +432,7 @@ implements \ArrayAccess
 	 */
 	public function handlePage($goto)
 	{
-		$this->page= $goto>0? $goto : 1;
+		$this->page= $goto<1? 1 : ($goto>$this->paginator->lastPage? $this->paginator->lastPage : $goto);
 		$this->finalize();
 	}
 

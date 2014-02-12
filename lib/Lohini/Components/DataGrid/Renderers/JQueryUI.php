@@ -71,6 +71,7 @@ extends Conventional
 			'button' => [
 				'first' => 'span class="paginator-first ui-icon ui-icon-seek-first" style="float: left;"',
 				'prev' => 'span class="paginator-prev ui-icon ui-icon-triangle-1-w" style="float: left;"',
+				'more' => 'span class="paginator-more ui-icon ui-icon-seek-next" style="float: left;"',
 				'next' => 'span class="paginator-next ui-icon ui-icon-triangle-1-e" style="float: left;"',
 				'last' => 'span class="paginator-last ui-icon ui-icon-seek-end" style="float: left;"',
 				],
@@ -151,6 +152,25 @@ extends Conventional
 				);
 		$controls->add(Html::el()->setHtml($html));
 		$container->add($controls);
+
+		// load more button
+		if ($this->dataGrid->enableLoadMore && $paginator->page<$paginator->pageCount) {
+			$more=$this->getWrapper('paginator button more');
+			$title=$this->dataGrid->translate('Load more data');
+			$link=clone $a->href($this->dataGrid->link('page', $paginator->page+1));
+			$link->addClass('loadMore');
+			$link->data([
+				'grid-more' => $paginator->page+1
+				]);
+			if ($more instanceof Html) {
+				$more=$link->add($more);
+				$more->title($title);
+				}
+			else {
+				$more=$link->setText($title);
+				}
+			$container->add($more);
+			}
 
 		// next button
 		$next=$this->getWrapper('paginator button next');

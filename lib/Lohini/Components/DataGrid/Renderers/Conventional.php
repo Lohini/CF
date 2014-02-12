@@ -74,6 +74,7 @@ implements IRenderer
 			'button' => [
 				'first' => 'span class="paginator-first"',
 				'prev' => 'span class="paginator-prev"',
+				'more' => 'span class="paginator-more"',
 				'next' => 'span class="paginator-next"',
 				'last' => 'span class="paginator-last"',
 				],
@@ -318,6 +319,25 @@ implements IRenderer
 		$controls->add(Html::el()->setHtml($html));
 		$container->add($controls);
 
+		// load more button
+		if ($this->dataGrid->enableLoadMore && $paginator->page<$paginator->pageCount) {
+			$more=$this->getWrapper('paginator button more');
+			$title=$this->dataGrid->translate('Load more data');
+			$link=clone $a->href($this->dataGrid->link('page', $paginator->page+1));
+			$link->addClass('loadMore');
+			$link->data([
+				'grid-more' => $paginator->page+1
+				]);
+			if ($more instanceof Html) {
+				$more=$link->add($more);
+				$more->title($title);
+				}
+			else {
+				$more=$link->setText($title);
+				}
+			$container->add($more);
+			}
+
 		// next button
 		$next=$this->getWrapper('paginator button next')->setText('>');
 		$title=$this->dataGrid->translate('Next');
@@ -418,6 +438,32 @@ implements IRenderer
 
 		$container->setHtml(trim($html, ' | '));
 		return $container->render();
+	}
+
+	/**
+	 * @param \Lohini\Components\DataGrid\DataGrid $dataGrid
+	 * @return string
+	 */
+	public function renderLoadMore(\Lohini\Components\DataGrid\DataGrid $dataGrid)
+	{
+		if ($this->dataGrid!==$dataGrid) {
+			$this->dataGrid=$dataGrid;
+			}
+		$paginator=$this->dataGrid->paginator;
+		if ($paginator->itemCount) {
+			$rows=$this->dataGrid->getRows();
+			$iterator=new \Nette\Iterators\CachingIterator($rows);
+			$container=Html::el();
+			foreach ($iterator as $data) {
+				$row=$this->generateContentRow($data);
+				if (!(($paginator->itemsPerPage*$paginator->page)%2) && $iterator->isEven()) {
+					$row->addClass($this->getValue('row.content .even'));
+					}
+				$container->add($row);
+				}
+			return $container->render();
+			}
+		return '';
 	}
 
 	/**
