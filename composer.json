@@ -3,7 +3,7 @@
 	"description": "Lohini CF - components & features",
 	"keywords": ["framework", "nette", "cms"],
 	"homepage": "http://lohini.net",
-	"license": "GPL-3.0",
+	"license": ["GPL-3.0", "GPL-2.0", "BSD-3-Clause"],
 	"authors": [
 		{
 			"name": "Pavol Hluchý",
