@@ -660,7 +660,7 @@ implements IRenderer
 				}
 
 			$cell->setHtml((string)$value);
-			$this->onCellRender($cell, $column->getName(), !($column instanceof ActionColumn)? $data[$column->getName()] : $data);
+			$this->onCellRender($cell, $column->getName(), !($column instanceof ActionColumn)? $data[$column->getName()] : $data, $column instanceof ActionColumn? NULL : $data);
 			$row->add($cell);
 			}
 		unset($form, $primary, $cell, $value, $action);
