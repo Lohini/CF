@@ -16,7 +16,8 @@ namespace Lohini\Components\DataGrid\Renderers;
 
 use Nette\Utils\Html,
 	Lohini\Components\DataGrid\Columns\ActionColumn,
-	Lohini\Components\DataGrid\Columns\Column;
+	Lohini\Components\DataGrid\Columns\Column,
+	Latte\Runtime\CachingIterator;
 
 /**
  * Converts a data grid into the HTML output
@@ -222,7 +223,7 @@ implements IRenderer
 		$body=Html::el($container->getName()=='table'? 'tbody' : NULL);
 
 		if ($this->dataGrid->paginator->itemCount) {
-			$iterator=new \Nette\Iterators\CachingIterator($this->dataGrid->getRows());
+			$iterator=new CachingIterator($this->dataGrid->getRows());
 			foreach ($iterator as $data) {
 				$row=$this->generateContentRow($data);
 				$row->addClass($iterator->isEven()? $this->getValue('row.content .even') : NULL);
@@ -452,7 +453,7 @@ implements IRenderer
 		$paginator=$this->dataGrid->paginator;
 		if ($paginator->itemCount) {
 			$rows=$this->dataGrid->getRows();
-			$iterator=new \Nette\Iterators\CachingIterator($rows);
+			$iterator=new CachingIterator($rows);
 			$container=Html::el();
 			foreach ($iterator as $data) {
 				$row=$this->generateContentRow($data);

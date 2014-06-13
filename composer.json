@@ -11,7 +11,7 @@
 		}
 	],
 	"require": {
-		"lohini/framework": "~0.4.1@dev",
+		"lohini/framework": "~0.4.2@dev",
 		"kdyby/console": "@dev"
 	},
 	"autoload": {
